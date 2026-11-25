@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>root@hari-guru:~# Bpk. Luthfi Abdul Rahman</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #050505;
+            font-family: 'Fira Code', monospace;
+            color: #00ff41;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Latar belakang animasi Matrix */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.25;
+        }
+
+        /* Kotak Terminal Hacker */
+        .terminal {
+            position: relative;
+            z-index: 1;
+            background: rgba(10, 15, 13, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.35);
+            width: 92%;
+            max-width: 650px;
+            overflow: hidden;
+            animation: bootUp 0.8s ease-out;
+        }
+
+        /* Header Window Terminal */
+        .terminal-header {
+            background: #111b15;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #00ff41;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 15px;
+            font-size: 0.85rem;
+            color: #88b396;
+        }
+
+        /* Isi Terminal */
+        .terminal-body {
+            padding: 25px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .command {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .highlight-name {
+            color: #ffffff;
+            background: rgba(0, 255, 65, 0.15);
+            border-left: 3px solid #00ff41;
+            padding: 8px 12px;
+            margin: 15px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+        }
+
+        .message-box {
+            color: #d1fae5;
+            min-height: 110px;
+            margin-bottom: 20px;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 9px;
+            height: 18px;
+            background-color: #00ff41;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        .footer-status {
+            border-top: 1px dashed #1f4d2e;
+            padding-top: 15px;
+            font-size: 0.85rem;
+            color: #6ee7b7;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes bootUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <div class="terminal-title">root@murid-terbaik:~/hari-guru.sh</div>
+        </div>
+
+        <div class="terminal-body">
+            <div class="command">$ ./run_tribute.sh --target="Guru_Terbaik"</div>
+            <div>[OK] Mengakses database rasa terima kasih...</div>
+            <div>[OK] Target teridentifikasi:</div>
+
+            <div class="highlight-name">
+                &gt; Bapak Luthfi Abdul Rahman
+            </div>
+
+            <div class="message-box">
+                <span id="typed-text"></span><span class="cursor"></span>
+            </div>
+
+            <div class="footer-status">
+                <span>STATUS: 100% RESPECT</span>
+                <span>BY: MURIDMU</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Efek Ketik Otomatis (Typing Effect)
+        const text = "Selamat Hari Guru Nasional, Pak! Terima kasih telah menjadi 'root' dari ilmu dan kesabaran yang menginspirasi kami. Semoga Bapak selalu diberikan kesehatan, kesuksesan, dan bebas dari segala 'bug' kehidupan. Terima kasih atas semua bimbingannya!";
+        const typedElement = document.getElementById("typed-text");
+        let index = 0;
+
+        function typeWriter() {
+            if (index < text.length) {
+                typedElement.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(typeWriter, 35); // Kecepatan ketik (ms)
+            }
+        }
+        setTimeout(typeWriter, 800);
+
+        // 2. Efek Hujan Kode Matrix di Background
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const letters = '010101ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/{}[];=+*#';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 40);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+</html>
